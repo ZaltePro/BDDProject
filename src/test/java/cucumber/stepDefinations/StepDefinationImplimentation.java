@@ -130,6 +130,8 @@ public class StepDefinationImplimentation {
 	    	Assert.assertEquals(driver.findElement(RegisterPage.Register_AccountCreatedPage_Title).getText(), "ACCOUNT CREATED!");
 	    	
 	    	driver.findElement(RegisterPage.Register_AccountCreatedPage_ContinueBtn).click();
+	    	
+	    	System.out.println("Close now");
 	    }
 
 }
