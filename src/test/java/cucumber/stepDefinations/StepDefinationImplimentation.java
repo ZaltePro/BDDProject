@@ -17,13 +17,18 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.github.bonigarcia.wdm.WebDriverManager;
+import pageObject.HomePage;
 import pageObject.RegisterPage;
+import resource.Utility;
 
 
 public class StepDefinationImplimentation {
 
 		WebDriver driver;
 		
+		RegisterPage registerPageObj;
+		
+		HomePage homepageObj;
 		
 	
 		@Given("i want to open the Ecomerce site")
@@ -44,9 +49,13 @@ public class StepDefinationImplimentation {
 	    @Given("I enter {string} and {string}")
 	    public void i_enter_FirstName_and_Email(String firstName, String email) {
 	        
-	    	driver.findElement(RegisterPage.register_Firstname).sendKeys(firstName);
-	    	driver.findElement(RegisterPage.register_email).sendKeys(email);
-	    	driver.findElement(RegisterPage.register_signUpBtn).click();
+	    	registerPageObj = new RegisterPage(driver);
+	    	
+	    	registerPageObj.enterFirstNameOnFirstPage(firstName);
+	    	
+	    	registerPageObj.enterEmailOnFirstPage(email);
+	    	
+	    	registerPageObj.clickSignButton();
 	    	
 	    	name_verify = firstName;
 	    	email_verify = email;
@@ -56,82 +65,115 @@ public class StepDefinationImplimentation {
 	    @When("I want to enter Account information: {string} , {string}, {string}")
 	    public void i_want_to_enter_account_information(String title, String password, String dateOfBirth) {
 	    	
-	    	WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+	    	registerPageObj = new RegisterPage(driver);
+	    	
+	    	Utility.visibilityOfElementLocated(driver , RegisterPage.Register_Heading);
 
-	    	Assert.assertEquals(wait.until(ExpectedConditions.visibilityOfElementLocated(RegisterPage.Register_Heading)).getText().toString(), "ENTER ACCOUNT INFORMATION");
+	    	Assert.assertEquals(registerPageObj.getHeadingText(), "ENTER ACCOUNT INFORMATION");
 	    	
 	    	//Select the Title
-	    	if(title.equals("Mr")) {
-	    		
-	    		driver.findElement(RegisterPage.Register_Title_Mr).click();
-	    	} else if (title.equals("Mrs")) {
-	    		driver.findElement(RegisterPage.Register_Title_Mrs).click();
-	    	}else {
+	    	if(title.equals("Mr"))
+	    	{
+	    		registerPageObj.selectMrTitle();
+	    	} 
+	    	else if (title.equals("Mrs")) 
+	    	{
+	    		registerPageObj.selectMrsTitle();
+	    	}
+	    	else 
+	    	{
 	    		System.out.println("Please select the title");
 	    	}
 	    	
 	    	//Verify name and email
-	    	Assert.assertEquals(driver.findElement(By.id("name")).getAttribute("value").trim(), name_verify);
+	    	Assert.assertEquals(registerPageObj.getName(), name_verify);
 	    	
-	    	Assert.assertEquals(driver.findElement(By.id("email")).getAttribute("value").trim(), email_verify);
-	    	
+	   
+	    	Assert.assertEquals(registerPageObj.getEmail(), email_verify);
 	    	
 	    	//Enter password
-	    	driver.findElement(RegisterPage.Register_Enter_Password).sendKeys(password);
+	    	registerPageObj.enterPassword(password);
 	    	
-	    	String[] datepicker = dateOfBirth.split("/");
-	    	
-	    	//Select day
-	    	Select day = new Select(driver.findElement(By.xpath("//select[@id='days']")));
-	    	day.selectByVisibleText(datepicker[0]);
-	  
-	    	
-	    	//Select month
-	    	Select monthSelect = new Select(driver.findElement(By.xpath("//select[@id='months']")));
-    		
-    		monthSelect.selectByValue(datepicker[1]);
-	    	
-	    	//Select year
-    		Select yearSelect = new Select(driver.findElement(By.xpath("//select[@id='years']")));
-    		
-    		yearSelect.selectByValue(datepicker[2]);
+	    	registerPageObj.selectDDMMYYY(dateOfBirth);
 
 	    }
 
 	    @And("I want to enter Addresss information: {string} , {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}")
 	    public void i_want_to_enter_addresss_information(String FirstName, String Lastname, String CompanyName, String address1, String address2, String Country, String State, String City, String zipcode, String mobileNumber) {
+	    	
+	    	registerPageObj = new RegisterPage(driver);
+	    	
+	    	registerPageObj.enter_addressInformation_FirstName(FirstName);
+	    	
+	    	registerPageObj.enter_addressInformation_LastName(Lastname);
+	    	
+	    	registerPageObj.enter_addressInformation_Company(CompanyName);
+	    	
+	    	registerPageObj.enter_addressInformation_Address1(address1);
+	    	
+	    	registerPageObj.enter_addressInformation_Address2(address2);
 
-	    	driver.findElement(RegisterPage.Register_addressInformation_FirstName).sendKeys(FirstName);
-	    	driver.findElement(RegisterPage.Register_addressInformation_LastName).sendKeys(Lastname);
-	    	driver.findElement(RegisterPage.Register_addressInformation_Company).sendKeys(CompanyName);
-	    	driver.findElement(RegisterPage.Register_addressInformation_Address1).sendKeys(address1);
-	    	driver.findElement(RegisterPage.Register_addressInformation_Address2).sendKeys(address2);
 	    	
-	    	Select county = new Select(driver.findElement(By.id("country")));	    	
+	    	registerPageObj.selectCountryInDropDown(Country);
 	    	
-	    	county.selectByValue(Country);
+	    	registerPageObj.enter_addressInformation_State(State);
 	    	
-	    	driver.findElement(RegisterPage.Register_addressInformation_State).sendKeys(State);
-	    	driver.findElement(RegisterPage.Register_addressInformation_City).sendKeys(City);
-	    	driver.findElement(RegisterPage.Register_addressInformation_Zipcode).sendKeys(zipcode);
-	    	driver.findElement(RegisterPage.Register_addressInformation_MobileNumber).sendKeys(mobileNumber);
+	    	registerPageObj.enter_addressInformation_City(City);
 	    	
-	    	((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", driver.findElement(RegisterPage.Register_addressInformation_CreateAccountBtn));
+	    	registerPageObj.enter_addressInformation_Zipcode(zipcode);
 	    	
-	    	driver.findElement(RegisterPage.Register_addressInformation_CreateAccountBtn).click();
+	    	registerPageObj.enter_addressInformation_MobileNumber(mobileNumber);
 	    	
+	    	Utility.ScrollToElement(driver , driver.findElement(RegisterPage.Register_addressInformation_CreateAccountBtn));
+	    	registerPageObj.click_CreateAccountBtn();
 	    	
 	    }
 
 	    @Then("I want to verify the account is created")
 	    public void i_want_to_verify_the_account_is_created() {
-	//        System.out.println("Verify account creation");
 	    	
-	    	Assert.assertEquals(driver.findElement(RegisterPage.Register_AccountCreatedPage_Title).getText(), "ACCOUNT CREATED!");
+	    	registerPageObj = new RegisterPage(driver);
 	    	
-	    	driver.findElement(RegisterPage.Register_AccountCreatedPage_ContinueBtn).click();
-	    	
-	    	System.out.println("Close now");
+	    	Assert.assertEquals(registerPageObj.get_AccountCreatedPage_Title(), "ACCOUNT CREATED!");
+
+	    	registerPageObj.click_AccountCreatedPage_ContinueBtn();
+
 	    }
+	    
+	    
+	    
+	    @Given("Click the Delete account button on header bar")
+	    public void click_the_delete_account_button_on_header_bar() {
+	    	
+	    	homepageObj = new HomePage(driver);
+	    	
+	    	homepageObj.clickDeleteAccountButton();
+	    
+	    	
+	    }
+	    @When("Varify the information messsage")
+	    public void varify_the_information_messsage() {
+	    	
+	    	homepageObj = new HomePage(driver);
+	    	
+	    	Assert.assertEquals(homepageObj.get_AccountDeleteTitleText(), "Account Deleted!");
+
+	    }
+	    @When("Click the Okay button")
+	    public void click_the_okay_button() {
+	    	
+	    	homepageObj = new HomePage(driver);
+	    	
+	    	homepageObj.clickContinue();
+
+	    }
+	    @Then("Check the deshboard")
+	    public void check_the_deshboard() {
+	    	
+	    	Assert.assertEquals(homepageObj.varifySignUpButton(), true);
+	    }
+	    
+	    
+	    
 
 }
